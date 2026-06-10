@@ -1,4 +1,5 @@
 # SnideCar
+This was coded with the help of AI (Codex) I am not a professional coder. Bugs and rough edges may exist.
 
 SnideCar is a COVAS:NEXT plugin that adds an optional second AI voice: a small sidecar commentator that occasionally reacts to selected ship events.
 
@@ -97,6 +98,4 @@ SnideCar is designed to be optional and low-authority.
 - It should not be treated as factual telemetry by the main AI.
 - It can be disabled, cooled down, randomized, or restricted to specific events.
 
-## Packaging
 
-Package the `SnideCarPlugin` folder. Do not include your COVAS:NEXT `config.json`, logs, cache files, or `__pycache__`.
