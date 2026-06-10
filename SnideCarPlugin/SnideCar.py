@@ -799,11 +799,14 @@ class SnideCarPlugin(PluginBase):
         self._main_ai_speaking = False
         self._worker_lock = threading.Lock()
         self._worker_running = False
+        self._latest_sidecar_context: dict[str, Any] | None = None
+        self._latest_sidecar_context_expires_at = 0.0
 
     @override
     def on_chat_start(self, helper: PluginHelper):
         self._helper = helper
         helper.register_sideeffect(self._on_event)
+        helper.register_status_generator(self._status_context)
         helper.register_action(
             "testSidecar",
             (
@@ -826,6 +829,21 @@ class SnideCarPlugin(PluginBase):
 
     def _should_main_ai_reply(self, event: PluginEvent) -> bool:
         return _as_bool(self.settings, "main_ai_can_react", False)
+
+    def _status_context(self, states: dict[str, Any]) -> list[tuple[str, Any]]:
+        if not _as_bool(self.settings, "main_ai_can_hear", True):
+            return []
+        if self._latest_sidecar_context is None:
+            return []
+        if time.time() > self._latest_sidecar_context_expires_at:
+            self._latest_sidecar_context = None
+            return []
+        return [
+            (
+                "Sidecar chatter",
+                self._latest_sidecar_context,
+            )
+        ]
 
     def _test_snidecar(self, params: SnideCarTestParams, context: dict[str, Any]) -> str:
         raw_event = (params.event or "LandingGearDown").strip() or "LandingGearDown"
@@ -878,6 +896,35 @@ class SnideCarPlugin(PluginBase):
             "Do not invent a crash, landing, damage, movement, or ship action that is not in the verified fact. "
             "If no urgent ship event supersedes it, respond directly to the sidecar in one short in-character line."
         )
+
+    def _store_sidecar_context_for_main_ai(self, sidecar_name: str, line: str, event_name: str) -> None:
+        fact = EVENT_TEST_FACTS.get(event_name, "")
+        self._latest_sidecar_context = {
+            "sidecar_voice_name": sidecar_name,
+            "event": event_name,
+            "line": line,
+            "verified_fact": fact,
+            "authority": "non-authoritative sidecar chatter, not ship telemetry",
+            "instruction": (
+                "If you respond, refer to the sidecar by sidecar_voice_name. "
+                "Do not repeat its wording. Do not invent facts not present in verified_fact."
+            ),
+        }
+        self._latest_sidecar_context_expires_at = time.time() + 45.0
+
+    def _trigger_main_ai_reply(self) -> None:
+        helper = self._helper
+        if helper is None:
+            return
+        if not _as_bool(self.settings, "main_ai_can_react", False):
+            return
+        try:
+            _, projected_states = helper._event_manager.get_current_state()
+            if helper._assistant.is_replying:
+                return
+            threading.Thread(target=helper._assistant.reply_thread, args=(projected_states,), daemon=True).start()
+        except Exception as e:
+            log("warn", f"SnideCar could not trigger main AI reply: {e}")
 
     def _on_event(self, event: Event, projected_states: dict[str, Any]) -> None:
         now = time.time()
@@ -1080,18 +1127,9 @@ class SnideCarPlugin(PluginBase):
                 pass
             if not _as_bool(self.settings, "main_ai_can_hear", True):
                 return
-            current_helper.dispatch_event(
-                PluginEvent(
-                    kind="plugin",
-                    plugin_event_name="SidecarCommentary",
-                    plugin_event_content={
-                        "name": sidecar_name,
-                        "text": line,
-                        "event": event_name,
-                        "fact": EVENT_TEST_FACTS.get(event_name, ""),
-                    },
-                )
-            )
+            self._store_sidecar_context_for_main_ai(sidecar_name, line, event_name)
+            if _as_bool(self.settings, "main_ai_can_react", False):
+                self._trigger_main_ai_reply()
 
         def show_sidecar_message() -> None:
             show_chat_message(
