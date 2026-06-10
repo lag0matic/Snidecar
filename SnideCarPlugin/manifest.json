@@ -1,0 +1,8 @@
+{
+  "guid": "7a7b596a-df7d-41b5-b9d7-93652d5513d9",
+  "name": "SnideCar",
+  "version": "0.0.1",
+  "author": "Lag0Matic",
+  "description": "A configurable sidecar commentator for COVAS:NEXT.",
+  "entrypoint": "SnideCar.py"
+}

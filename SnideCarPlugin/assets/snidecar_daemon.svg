@@ -1,0 +1,219 @@
+<svg class="listening" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="SnideCar sci-fi interface avatar">
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    .outer-ring {
+      fill: none;
+      stroke: #1bd8ff;
+      stroke-width: 5;
+      filter: drop-shadow(0 0 12px rgba(27, 216, 255, 0.75));
+    }
+
+    .thin-ring {
+      fill: none;
+      stroke: #8beaff;
+      stroke-width: 2;
+      opacity: 0.75;
+    }
+
+    .broken-ring {
+      fill: none;
+      stroke: #16b8e8;
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-dasharray: 78 26 18 32 116 44;
+      opacity: 0.95;
+      transform-origin: 256px 256px;
+      filter: drop-shadow(0 0 12px rgba(22, 184, 232, 0.65));
+    }
+
+    .inner-ring {
+      fill: rgba(8, 34, 48, 0.68);
+      stroke: #0ea5c9;
+      stroke-width: 3;
+    }
+
+    .reticle {
+      stroke: #1bd8ff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 8px rgba(27, 216, 255, 0.55));
+    }
+
+    .core {
+      fill: #031922;
+      stroke: #d7fbff;
+      stroke-width: 4;
+      filter: drop-shadow(0 0 14px rgba(215, 251, 255, 0.8));
+    }
+
+    .core-mark {
+      fill: none;
+      stroke: #18d3ff;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .scanner {
+      fill: rgba(27, 216, 255, 0.12);
+      stroke: #1bd8ff;
+      stroke-width: 2;
+      opacity: 0.65;
+      transform-origin: 256px 256px;
+    }
+
+    .audio-bar {
+      fill: #7cffd2;
+      opacity: 0.45;
+      filter: drop-shadow(0 0 7px rgba(124, 255, 210, 0.75));
+      transform-origin: center bottom;
+    }
+
+    .side-meter-bg {
+      fill: #06131b;
+      stroke: #1d5365;
+      stroke-width: 2;
+    }
+
+    .side-meter {
+      fill: #89ff42;
+      opacity: 0.72;
+      filter: drop-shadow(0 0 7px rgba(137, 255, 66, 0.75));
+      transform-origin: center bottom;
+    }
+
+    .warning {
+      fill: #ff3045;
+      opacity: 0;
+      filter: drop-shadow(0 0 13px rgba(255, 48, 69, 0.85));
+    }
+
+    .listening .broken-ring {
+      animation: slow-turn 18s linear infinite;
+    }
+
+    .listening .scanner {
+      animation: scanner-sweep 3.8s ease-in-out infinite;
+    }
+
+    .speaking .broken-ring {
+      animation: fast-turn 3.5s linear infinite;
+    }
+
+    .speaking .audio-bar {
+      opacity: 1;
+      animation: talk-bars 0.55s infinite steps(3, end);
+    }
+
+    .speaking .audio-bar:nth-child(2n) {
+      animation-delay: 0.08s;
+    }
+
+    .speaking .audio-bar:nth-child(3n) {
+      animation-delay: 0.16s;
+    }
+
+    .speaking .core {
+      filter: drop-shadow(0 0 20px rgba(215, 251, 255, 1));
+    }
+
+    .thinking .scanner {
+      opacity: 1;
+      animation: scanner-sweep 1.3s ease-in-out infinite;
+    }
+
+    .thinking .thin-ring {
+      stroke: #7cffd2;
+      filter: drop-shadow(0 0 10px rgba(124, 255, 210, 0.75));
+    }
+
+    .acting .warning {
+      opacity: 1;
+      animation: warning-pulse 0.62s infinite steps(2, end);
+    }
+
+    .acting .side-meter {
+      fill: #ff3045;
+      opacity: 1;
+    }
+
+    .acting .broken-ring {
+      stroke: #ff3045;
+      filter: drop-shadow(0 0 14px rgba(255, 48, 69, 0.75));
+      animation: fast-turn 1.8s linear infinite;
+    }
+
+    @keyframes slow-turn {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fast-turn {
+      to { transform: rotate(-360deg); }
+    }
+
+    @keyframes scanner-sweep {
+      0% { transform: rotate(-42deg); opacity: 0.18; }
+      50% { transform: rotate(28deg); opacity: 0.85; }
+      100% { transform: rotate(-42deg); opacity: 0.18; }
+    }
+
+    @keyframes talk-bars {
+      0% { transform: scaleY(0.28); }
+      33% { transform: scaleY(0.88); }
+      66% { transform: scaleY(0.46); }
+      100% { transform: scaleY(0.72); }
+    }
+
+    @keyframes warning-pulse {
+      0%, 45% { opacity: 1; }
+      46%, 100% { opacity: 0.2; }
+    }
+  </style>
+
+  <circle class="outer-ring" cx="256" cy="256" r="205" />
+  <circle class="thin-ring" cx="256" cy="256" r="188" />
+  <circle class="thin-ring" cx="256" cy="256" r="151" />
+  <circle class="broken-ring" cx="256" cy="256" r="171" />
+  <circle class="inner-ring" cx="256" cy="256" r="104" />
+
+  <path class="scanner" d="M256 256 L256 81 A175 175 0 0 1 354 111 Z" />
+
+  <path class="reticle" d="M256 82 V151" />
+  <path class="reticle" d="M256 361 V430" />
+  <path class="reticle" d="M82 256 H151" />
+  <path class="reticle" d="M361 256 H430" />
+  <path class="reticle" d="M180 180 212 212" />
+  <path class="reticle" d="M332 180 300 212" />
+  <path class="reticle" d="M180 332 212 300" />
+  <path class="reticle" d="M332 332 300 300" />
+
+  <circle class="core" cx="256" cy="256" r="54" />
+  <path class="core-mark" d="M226 256 H286" />
+  <path class="core-mark" d="M256 226 V286" />
+  <path class="core-mark" d="M236 236 276 276" />
+  <path class="core-mark" d="M276 236 236 276" />
+
+  <g>
+    <rect class="audio-bar" x="166" y="369" width="12" height="36" rx="4" />
+    <rect class="audio-bar" x="187" y="354" width="12" height="51" rx="4" />
+    <rect class="audio-bar" x="208" y="376" width="12" height="29" rx="4" />
+    <rect class="audio-bar" x="229" y="346" width="12" height="59" rx="4" />
+    <rect class="audio-bar" x="250" y="363" width="12" height="42" rx="4" />
+    <rect class="audio-bar" x="271" y="350" width="12" height="55" rx="4" />
+    <rect class="audio-bar" x="292" y="375" width="12" height="30" rx="4" />
+    <rect class="audio-bar" x="313" y="358" width="12" height="47" rx="4" />
+    <rect class="audio-bar" x="334" y="370" width="12" height="35" rx="4" />
+  </g>
+
+  <rect class="side-meter-bg" x="428" y="124" width="30" height="164" rx="6" />
+  <rect class="side-meter" x="436" y="252" width="14" height="22" rx="3" />
+  <rect class="side-meter" x="436" y="220" width="14" height="22" rx="3" />
+  <rect class="side-meter" x="436" y="188" width="14" height="22" rx="3" />
+  <rect class="side-meter" x="436" y="156" width="14" height="22" rx="3" />
+  <circle class="warning" cx="414" cy="78" r="18" />
+  <circle class="warning" cx="414" cy="78" r="8" fill="#fff5f5" />
+</svg>
