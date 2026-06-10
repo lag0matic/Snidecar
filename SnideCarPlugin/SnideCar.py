@@ -926,6 +926,26 @@ class SnideCarPlugin(PluginBase):
         except Exception as e:
             log("warn", f"SnideCar could not trigger main AI reply: {e}")
 
+    def _queue_hidden_sidecar_event_for_main_ai(self, sidecar_name: str, line: str, event_name: str) -> None:
+        helper = self._helper
+        if helper is None:
+            return
+        try:
+            event = PluginEvent(
+                kind="plugin",
+                plugin_event_name="SidecarCommentary",
+                plugin_event_content={
+                    "name": sidecar_name,
+                    "text": line,
+                    "event": event_name,
+                    "fact": EVENT_TEST_FACTS.get(event_name, ""),
+                },
+            )
+            event.processed_at = time.time()
+            helper._event_manager.short_term_memory.insert_event(event, event.processed_at)
+        except Exception as e:
+            log("warn", f"SnideCar could not queue hidden sidecar event: {e}")
+
     def _on_event(self, event: Event, projected_states: dict[str, Any]) -> None:
         now = time.time()
         if isinstance(event, ConversationEvent):
@@ -1129,6 +1149,7 @@ class SnideCarPlugin(PluginBase):
                 return
             self._store_sidecar_context_for_main_ai(sidecar_name, line, event_name)
             if _as_bool(self.settings, "main_ai_can_react", False):
+                self._queue_hidden_sidecar_event_for_main_ai(sidecar_name, line, event_name)
                 self._trigger_main_ai_reply()
 
         def show_sidecar_message() -> None:
