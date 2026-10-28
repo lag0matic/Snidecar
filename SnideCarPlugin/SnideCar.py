@@ -54,6 +54,8 @@ DEFAULT_PROMPT = (
     "Do not ask questions, offer help, say 'as an AI,' or invent details not present in the event."
 )
 
+MAIN_AI_REACT_DELAY_SECONDS = 2.0
+
 DEFAULT_TRIGGER_EVENTS = "\n".join(
     [
         "AfmuRepairs",
@@ -154,66 +156,148 @@ CRITICAL_EVENTS = {
 }
 
 MAX_CONTEXT_VALUE_LENGTH = 140
+EVENT_GROUPS: list[tuple[str, str, list[tuple[str, bool]]]] = [
+    (
+        "docking",
+        "Docking / Launch",
+        [
+            ("DockingRequested", False),
+            ("DockingGranted", True),
+            ("DockingDenied", True),
+            ("DockingCancelled", True),
+            ("DockingTimeout", True),
+            ("DockingComputerDocking", False),
+            ("DockingComputerUndocking", False),
+            ("DockingComputerDeactivated", False),
+            ("InDockingRange", False),
+            ("Docked", True),
+            ("Undocked", True),
+        ],
+    ),
+    (
+        "travel",
+        "FSD / Travel",
+        [
+            ("FSDJump", True),
+            ("FSDTarget", False),
+            ("FsdCharging", True),
+            ("StartJump", False),
+            ("FsdMassLocked", False),
+            ("FsdMassLockEscaped", False),
+            ("NavRoute", False),
+            ("NavRouteClear", False),
+            ("SupercruiseEntry", True),
+            ("SupercruiseExit", True),
+            ("SupercruiseDestinationDrop", True),
+            ("GlideModeEntered", False),
+            ("GlideModeExited", False),
+        ],
+    ),
+    (
+        "fuel",
+        "Fuel / Scooping",
+        [
+            ("FuelScoopStarted", True),
+            ("FuelScoop", False),
+            ("FuelScoopEnded", True),
+            ("LowFuelWarning", True),
+            ("LowFuelWarningCleared", False),
+            ("RefuelAll", True),
+            ("RefuelPartial", True),
+            ("ReservoirReplenished", False),
+            ("JetConeBoost", True),
+            ("JetConeDamage", True),
+        ],
+    ),
+    (
+        "handling",
+        "Ship Handling",
+        [
+            ("LandingGearDown", True),
+            ("LandingGearUp", True),
+            ("CargoScoopDeployed", False),
+            ("CargoScoopRetracted", False),
+            ("FlightAssistOff", False),
+            ("FlightAssistOn", False),
+            ("LightsOff", False),
+            ("LightsOn", False),
+            ("SilentRunningOff", False),
+            ("SilentRunningOn", False),
+            ("HudSwitchedToAnalysisMode", False),
+            ("HudSwitchedToCombatMode", False),
+            ("NightVisionOff", False),
+            ("NightVisionOn", False),
+        ],
+    ),
+    (
+        "danger",
+        "Heat / Damage / Danger",
+        [
+            ("HeatWarning", False),
+            ("HeatDamage", False),
+            ("HullDamage", False),
+            ("ShieldState", False),
+            ("CockpitBreached", False),
+            ("InDanger", False),
+            ("OutofDanger", False),
+            ("AfmuRepairs", False),
+            ("RebootRepair", False),
+            ("Repair", False),
+            ("RepairAll", False),
+        ],
+    ),
+    (
+        "combat",
+        "Combat / Weapons",
+        [
+            ("BeingInterdicted", True),
+            ("Interdiction", True),
+            ("Interdicted", True),
+            ("CombatEntered", False),
+            ("CombatExited", False),
+            ("HardpointsDeployed", False),
+            ("HardpointsRetracted", False),
+            ("WeaponSelected", False),
+        ],
+    ),
+    (
+        "modules",
+        "Modules / Shipyard",
+        [
+            ("Loadout", False),
+            ("ModuleBuy", False),
+            ("ModuleInfo", False),
+            ("ModuleRetrieve", False),
+            ("ModuleSell", False),
+            ("ModuleSellRemote", False),
+            ("ModuleStore", False),
+            ("ModuleSwap", False),
+            ("ShipyardBuy", False),
+            ("ShipyardNew", False),
+            ("ShipyardSell", False),
+            ("ShipyardSwap", False),
+            ("ShipyardTransfer", False),
+            ("ShipyardTransferCompleted", False),
+        ],
+    ),
+    (
+        "systems",
+        "Systems",
+        [
+            ("SystemsShutdown", True),
+        ],
+    ),
+]
 EVENT_FAMILIES = {
-    "LandingGearDown": "landing_gear",
-    "LandingGearUp": "landing_gear",
-    "CargoScoopDeployed": "cargo_scoop",
-    "CargoScoopRetracted": "cargo_scoop",
-    "Docked": "docking",
-    "DockingGranted": "docking",
-    "DockingDenied": "docking",
-    "DockingCancelled": "docking",
-    "DockingTimeout": "docking",
-    "DockingRequested": "docking",
-    "DockingComputerDocking": "docking",
-    "DockingComputerUndocking": "docking",
-    "DockingComputerDeactivated": "docking",
-    "InDockingRange": "docking",
-    "Undocked": "docking",
-    "FSDJump": "fsd",
-    "FSDTarget": "fsd",
-    "FsdCharging": "fsd",
-    "FsdMassLocked": "fsd",
-    "FsdMassLockEscaped": "fsd",
-    "StartJump": "fsd",
-    "SupercruiseDestinationDrop": "supercruise",
-    "SupercruiseEntry": "supercruise",
-    "SupercruiseExit": "supercruise",
-    "GlideModeEntered": "glide",
-    "GlideModeExited": "glide",
-    "HeatDamage": "heat",
-    "HeatWarning": "heat",
-    "FuelScoop": "fuel",
-    "FuelScoopEnded": "fuel",
-    "FuelScoopStarted": "fuel",
-    "LowFuelWarning": "fuel",
-    "LowFuelWarningCleared": "fuel",
-    "RefuelAll": "fuel",
-    "RefuelPartial": "fuel",
-    "ReservoirReplenished": "fuel",
-    "HardpointsDeployed": "hardpoints",
-    "HardpointsRetracted": "hardpoints",
-    "HudSwitchedToAnalysisMode": "hud_mode",
-    "HudSwitchedToCombatMode": "hud_mode",
-    "NightVisionOff": "night_vision",
-    "NightVisionOn": "night_vision",
-    "SilentRunningOff": "silent_running",
-    "SilentRunningOn": "silent_running",
-    "LightsOff": "lights",
-    "LightsOn": "lights",
-    "ModuleBuy": "modules",
-    "ModuleInfo": "modules",
-    "ModuleRetrieve": "modules",
-    "ModuleSell": "modules",
-    "ModuleSellRemote": "modules",
-    "ModuleStore": "modules",
-    "ModuleSwap": "modules",
-    "ShipyardBuy": "shipyard",
-    "ShipyardNew": "shipyard",
-    "ShipyardSell": "shipyard",
-    "ShipyardSwap": "shipyard",
-    "ShipyardTransfer": "shipyard",
-    "ShipyardTransferCompleted": "shipyard",
+    event_name: family
+    for family, _label, events in EVENT_GROUPS
+    for event_name, _default_enabled in events
+}
+DEFAULT_EVENT_ENABLED = {
+    event_name
+    for _family, _label, events in EVENT_GROUPS
+    for event_name, default_enabled in events
+    if default_enabled
 }
 
 
@@ -366,6 +450,41 @@ def _parse_event_list(raw: str) -> set[str]:
         for part in re.split(r"[\n,;]+", raw)
         if part.strip()
     }
+
+
+def _event_setting_key(event_name: str) -> str:
+    return f"event_enabled_{event_name}"
+
+
+def _event_enabled(settings: dict[str, Any], event_name: str) -> bool:
+    if event_name not in EVENT_FAMILIES:
+        return False
+    return _as_bool(settings, _event_setting_key(event_name), event_name in DEFAULT_EVENT_ENABLED)
+
+
+def _event_toggle_setting(event_name: str, default_enabled: bool) -> ToggleSetting:
+    return ToggleSetting(
+        key=_event_setting_key(event_name),
+        label=event_name,
+        type="toggle",
+        readonly=False,
+        placeholder=None,
+        default_value=default_enabled,
+    )
+
+
+def _event_settings_grids() -> list[SettingsGrid]:
+    return [
+        SettingsGrid(
+            key=f"events_{family}",
+            label=label,
+            fields=[
+                _event_toggle_setting(event_name, default_enabled)
+                for event_name, default_enabled in events
+            ],
+        )
+        for family, label, events in EVENT_GROUPS
+    ]
 
 
 TEST_EVENT_ALIASES = {
@@ -523,25 +642,6 @@ class SnideCarPlugin(PluginBase):
                 key="general",
                 label="General",
                 fields=[
-                    ParagraphSetting(
-                        key="about",
-                        label="About SnideCar",
-                        type="paragraph",
-                        readonly=True,
-                        placeholder=None,
-                        content=(
-                            "SnideCar adds an optional second voice that occasionally comments on selected events. "
-                            "It is entertainment chatter, not ship telemetry."
-                        ),
-                    ),
-                    ToggleSetting(
-                        key="enabled",
-                        label="Enabled",
-                        type="toggle",
-                        readonly=False,
-                        placeholder=None,
-                        default_value=False,
-                    ),
                     TextSetting(
                         key="sidecar_name",
                         label="Sidecar name",
@@ -552,6 +652,58 @@ class SnideCarPlugin(PluginBase):
                         max_length=80,
                         min_length=None,
                         hidden=False,
+                    ),
+                    ToggleSetting(
+                        key="enabled",
+                        label="Enabled",
+                        type="toggle",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=False,
+                    ),
+                    NumericalSetting(
+                        key="chance_percent",
+                        label="Chance to comment percent",
+                        type="number",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=25,
+                        min_value=0,
+                        max_value=100,
+                        step=1,
+                    ),
+                    NumericalSetting(
+                        key="cooldown_seconds",
+                        label="Main cooldown seconds",
+                        type="number",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=180,
+                        min_value=0,
+                        max_value=3600,
+                        step=5,
+                    ),
+                    NumericalSetting(
+                        key="related_event_cooldown_seconds",
+                        label="Event cooldown seconds",
+                        type="number",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=60,
+                        min_value=0,
+                        max_value=3600,
+                        step=5,
+                    ),
+                    NumericalSetting(
+                        key="minimum_seconds_after_main_ai",
+                        label="Minimum seconds after main AI speaks",
+                        type="number",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=6,
+                        min_value=0,
+                        max_value=300,
+                        step=1,
                     ),
                     ToggleSetting(
                         key="read_aloud",
@@ -578,30 +730,8 @@ class SnideCarPlugin(PluginBase):
                         default_value=False,
                     ),
                     NumericalSetting(
-                        key="cooldown_seconds",
-                        label="Cooldown seconds",
-                        type="number",
-                        readonly=False,
-                        placeholder=None,
-                        default_value=180,
-                        min_value=0,
-                        max_value=3600,
-                        step=5,
-                    ),
-                    NumericalSetting(
-                        key="related_event_cooldown_seconds",
-                        label="Related-event cooldown seconds",
-                        type="number",
-                        readonly=False,
-                        placeholder=None,
-                        default_value=60,
-                        min_value=0,
-                        max_value=3600,
-                        step=5,
-                    ),
-                    NumericalSetting(
-                        key="chance_percent",
-                        label="Chance to comment percent",
+                        key="main_ai_reaction_chance_percent",
+                        label="Main AI reaction chance percent",
                         type="number",
                         readonly=False,
                         placeholder=None,
@@ -609,25 +739,6 @@ class SnideCarPlugin(PluginBase):
                         min_value=0,
                         max_value=100,
                         step=1,
-                    ),
-                    NumericalSetting(
-                        key="minimum_seconds_after_main_ai",
-                        label="Minimum seconds after main AI speaks",
-                        type="number",
-                        readonly=False,
-                        placeholder=None,
-                        default_value=6,
-                        min_value=0,
-                        max_value=300,
-                        step=1,
-                    ),
-                    ToggleSetting(
-                        key="suppress_critical",
-                        label="Suppress during critical danger",
-                        type="toggle",
-                        readonly=False,
-                        placeholder=None,
-                        default_value=True,
                     ),
                 ],
             ),
@@ -771,12 +882,54 @@ class SnideCarPlugin(PluginBase):
                 ],
             ),
             SettingsGrid(
-                key="events",
-                label="Events",
+                key="events_about",
+                label="Event Controls",
                 fields=[
+                    ParagraphSetting(
+                        key="event_about",
+                        label="Event Visibility",
+                        type="paragraph",
+                        readonly=True,
+                        placeholder=None,
+                        content="Choose the specific ship events this sidecar can see.",
+                    ),
+                    ToggleSetting(
+                        key="suppress_critical",
+                        label="Stay quiet during combat or damage",
+                        type="toggle",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=True,
+                    ),
+                    ParagraphSetting(
+                        key="suppress_critical_about",
+                        label=None,
+                        type="paragraph",
+                        readonly=True,
+                        placeholder=None,
+                        content=(
+                            "Prevents sidecar comments on incoming fire, combat start, hull damage, "
+                            "shield changes, shield loss, heat damage, and interdiction events."
+                        ),
+                    ),
+                ],
+            ),
+            *_event_settings_grids(),
+            SettingsGrid(
+                key="events_advanced",
+                label="Advanced Events",
+                fields=[
+                    ToggleSetting(
+                        key="use_custom_event_allowlist",
+                        label="Use custom event allowlist",
+                        type="toggle",
+                        readonly=False,
+                        placeholder=None,
+                        default_value=False,
+                    ),
                     TextAreaSetting(
                         key="trigger_events",
-                        label="Allowed events",
+                        label="Custom allowed events",
                         type="textarea",
                         readonly=False,
                         placeholder="One event name per line",
@@ -926,6 +1079,20 @@ class SnideCarPlugin(PluginBase):
         except Exception as e:
             log("warn", f"SnideCar could not trigger main AI reply: {e}")
 
+    def _trigger_main_ai_reply_after_delay(self) -> None:
+        def delayed_reply() -> None:
+            self._trigger_main_ai_reply()
+
+        threading.Timer(MAIN_AI_REACT_DELAY_SECONDS, delayed_reply).start()
+
+    def _should_trigger_main_ai_reaction(self) -> bool:
+        if not _as_bool(self.settings, "main_ai_can_react", False):
+            return False
+        chance = max(0.0, min(100.0, _as_float(self.settings, "main_ai_reaction_chance_percent", 25.0)))
+        if chance <= 0:
+            return False
+        return chance >= 100 or random.random() * 100.0 <= chance
+
     def _queue_hidden_sidecar_event_for_main_ai(self, sidecar_name: str, line: str, event_name: str) -> None:
         helper = self._helper
         if helper is None:
@@ -992,8 +1159,11 @@ class SnideCarPlugin(PluginBase):
         if not event_name:
             return False
 
-        triggers = _parse_event_list(_as_str(self.settings, "trigger_events", DEFAULT_TRIGGER_EVENTS))
-        if event_name not in triggers:
+        if _as_bool(self.settings, "use_custom_event_allowlist", False):
+            triggers = _parse_event_list(_as_str(self.settings, "trigger_events", DEFAULT_TRIGGER_EVENTS))
+            if event_name not in triggers:
+                return False
+        elif not _event_enabled(self.settings, event_name):
             return False
 
         if _as_bool(self.settings, "suppress_critical", True) and event_name in CRITICAL_EVENTS:
@@ -1148,9 +1318,9 @@ class SnideCarPlugin(PluginBase):
             if not _as_bool(self.settings, "main_ai_can_hear", True):
                 return
             self._store_sidecar_context_for_main_ai(sidecar_name, line, event_name)
-            if _as_bool(self.settings, "main_ai_can_react", False):
-                self._queue_hidden_sidecar_event_for_main_ai(sidecar_name, line, event_name)
-                self._trigger_main_ai_reply()
+            self._queue_hidden_sidecar_event_for_main_ai(sidecar_name, line, event_name)
+            if self._should_trigger_main_ai_reaction():
+                self._trigger_main_ai_reply_after_delay()
 
         def show_sidecar_message() -> None:
             show_chat_message(
